@@ -1,114 +1,104 @@
-# 🖼️ Image Optimization Tool
+# Image Optimization Tool
 
-Ein CLI-Tool zur automatischen Bildoptimierung für das Web. Das Tool liest alle Bilddateien aus dem `input/`-Ordner, optimiert sie und speichert die Ergebnisse im `output/`-Ordner.
+Ein schlankes CLI-Tool zur automatischen Bildoptimierung für das Web. Bilder aus dem `input/`-Ordner werden verkleinert, komprimiert und als **JPEG** und **WebP** in den `output/`-Ordner geschrieben.
 
----
+## Features
 
-## 🎯 Ziel
+- **Dual-Export** — Jedes Bild wird als `.jpg` und `.webp` ausgegeben
+- **Automatische Skalierung** — Die längste Kante wird auf maximal 1920 px begrenzt; kleinere Bilder bleiben unverändert
+- **EXIF-Korrektur** — Rotierte Fotos (z. B. Handy-Hochformat) werden automatisch korrekt ausgerichtet
+- **Transparenz-Handling** — PNG mit Alpha-Kanal (RGBA) wird auf weißem Hintergrund für JPEG abgeflacht
+- **Fortschrittsausgabe** — Dimensionen, Dateigrößen und Einsparung in % pro Bild
+- **Fehlerresistent** — Beschädigte oder nicht lesbare Dateien werden übersprungen und geloggt
 
-Alle Bilder aus dem Input-Ordner automatisch für den Einsatz im Web optimieren:
+## Voraussetzungen
 
-- **Format-Konvertierung:** Jedes Bild wird als optimiertes `.jpg` **und** als optimiertes `.webp` ausgegeben
-- **Größenanpassung:** Die längste Kante wird auf **maximal 1920 Pixel** begrenzt (kleinere Bilder bleiben unverändert)
-- **Qualitätsoptimierung:** Komprimierung für schnelle Ladezeiten bei guter visueller Qualität
+- Python 3.10+
+- [Pillow](https://python-pillow.org/)
 
----
+## Installation
 
-## 📁 Ordnerstruktur
+```bash
+git clone https://github.com/dein-name/image-optimization.git
+cd image-optimization
+pip install -r requirements.txt
+```
+
+## Nutzung
+
+1. Bilder in den `input/`-Ordner legen
+2. Script ausführen:
+
+```bash
+python optimize.py
+```
+
+3. Optimierte Bilder befinden sich im `output/`-Ordner
+
+### Beispiel-Output
+
+```
+Image Optimization Tool
+==================================================
+Input-Ordner : /pfad/zum/projekt/input
+Output-Ordner: /pfad/zum/projekt/output
+Max. Kantenlaenge: 1920px  |  JPEG: 85%  |  WebP: 80%
+==================================================
+3 Bild(er) gefunden
+
+[1/3] foto.jpg
+  Dimension : 4000x3000px -> 1920x1440px
+  Original  : 5.2 MB
+  JPEG      : 312.4 KB (+94%)
+  WebP      : 134.7 KB (+97%)
+
+...
+
+==================================================
+Fertig!
+  Verarbeitet : 3
+  Fehler      : 0
+==================================================
+```
+
+## Unterstuetzte Formate
+
+| Eingabe | Ausgabe |
+|---------|---------|
+| `.jpg`, `.jpeg` | `.jpg` + `.webp` |
+| `.png` | `.jpg` + `.webp` |
+| `.webp` | `.jpg` + `.webp` |
+| `.bmp`, `.tiff`, `.tif` | `.jpg` + `.webp` |
+
+## Ordnerstruktur
 
 ```
 image-optimization/
-├── input/              # Quellbilder hier ablegen
-├── output/             # Optimierte Bilder werden hier ausgegeben
-│   ├── bild1.jpg       # Optimiertes JPEG
-│   ├── bild1.webp      # Optimiertes WebP
-│   ├── bild2.jpg
-│   ├── bild2.webp
-│   └── ...
-├── optimize.py         # Haupt-Script
-├── requirements.txt    # Python-Abhängigkeiten
-├── .gitignore
+├── input/           # Quellbilder hier ablegen
+├── output/          # Optimierte Bilder (wird automatisch erstellt)
+├── optimize.py
+├── requirements.txt
 └── README.md
 ```
 
----
+## Konfiguration
 
-## ⚙️ Geplante Features
+Die Standardwerte lassen sich direkt am Anfang von `optimize.py` anpassen:
 
-### MVP (v1.0)
-
-- [ ] **Input-Ordner scannen** — Alle gängigen Bildformate erkennen (`.jpg`, `.jpeg`, `.png`, `.bmp`, `.tiff`, `.webp`)
-- [ ] **Größenanpassung** — Bilder proportional skalieren, sodass die längste Kante max. 1920px beträgt
-- [ ] **JPEG-Export** — Optimiertes JPEG mit konfigurierbarer Qualität (Standard: 85%)
-- [ ] **WebP-Export** — Optimiertes WebP mit konfigurierbarer Qualität (Standard: 80%)
-- [ ] **Dateinamen beibehalten** — Originalname wird für beide Output-Dateien übernommen (z.B. `foto.jpg` + `foto.webp`)
-- [ ] **Fortschrittsanzeige** — Konsolenausgabe mit Verarbeitungsstatus pro Bild
-- [ ] **Fehlerbehandlung** — Beschädigte oder nicht unterstützte Dateien überspringen und loggen
-
-### Optional (v1.1+)
-
-- [ ] Konfigurierbare maximale Kantenlänge (CLI-Argument)
-- [ ] Konfigurierbare Qualitätsstufen (CLI-Argument)
-- [ ] Unterordner-Struktur im Input beibehalten
-- [ ] Bereits verarbeitete Bilder überspringen (Skip-Logik)
-- [ ] Batch-Verarbeitung mit Fortschrittsbalken (z.B. `tqdm`)
-
----
-
-## 🛠️ Technologie-Stack
-
-| Komponente       | Technologie                          |
-|------------------|--------------------------------------|
-| Sprache          | **Python 3.10+**                     |
-| Bildverarbeitung | **Pillow** (PIL Fork)                |
-| CLI              | **argparse** (Python Standardlib)    |
-| Fortschritt      | **print** / optional `tqdm`          |
-
----
-
-## 🚀 Geplante Nutzung
-
-```bash
-# 1. Abhängigkeiten installieren
-pip install -r requirements.txt
-
-# 2. Bilder in den input/-Ordner legen
-
-# 3. Script ausführen
-python optimize.py
-
-# 4. Optimierte Bilder befinden sich im output/-Ordner
+```python
+MAX_SIZE     = 1920   # Maximale Kantenlange in Pixeln
+QUALITY_JPG  = 85     # JPEG-Qualitat (0-95)
+QUALITY_WEBP = 80     # WebP-Qualitat (0-100)
 ```
 
-### Optionale CLI-Argumente (v1.1+)
+## Roadmap
 
-```bash
-python optimize.py --max-size 1920 --quality-jpg 85 --quality-webp 80
-```
+- [ ] CLI-Argumente (`--max-size`, `--quality-jpg`, `--quality-webp`)
+- [ ] `--skip-existing` — bereits verarbeitete Bilder ueberspringen
+- [ ] Unterordner-Struktur beibehalten
+- [ ] Fortschrittsbalken mit `tqdm`
+- [ ] AVIF-Export als drittes Format
 
----
+## Lizenz
 
-## 📋 Implementierungsplan
-
-### Schritt 1: Setup
-- `requirements.txt` mit Pillow erstellen
-- Grundstruktur des Scripts `optimize.py` anlegen
-
-### Schritt 2: Kern-Logik
-1. **Input-Ordner lesen** — Alle Bilddateien identifizieren
-2. **Bild laden** — Mit Pillow öffnen und EXIF-Orientierung berücksichtigen
-3. **Größe anpassen** — Proportional skalieren, falls längste Kante > 1920px
-4. **Als JPEG speichern** — Optimiert mit konfigurierter Qualität
-5. **Als WebP speichern** — Optimiert mit konfigurierter Qualität
-6. **Fortschritt ausgeben** — Dateiname, Originalgröße → neue Größe, Dateigröße
-
-### Schritt 3: Fehlerbehandlung & Polish
-- Try/Except um die Bildverarbeitung
-- Zusammenfassung am Ende (Anzahl verarbeitet, übersprungen, Fehler)
-- Output-Ordner automatisch erstellen falls nicht vorhanden
-
----
-
-## 📄 Lizenz
-
-Privates Projekt
+MIT
